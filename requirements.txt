@@ -1,0 +1,9 @@
+asgiref==3.8.1
+beautifulsoup4==4.13.4
+Django==5.2.3
+django-bootstrap5==25.1
+platformshconfig==2.4.0
+soupsieve==2.7
+sqlparse==0.5.3
+typing_extensions==4.14.1
+tzdata==2025.2
