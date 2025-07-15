@@ -1,0 +1,80 @@
+{% extends "learning_logs/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block page_header %}
+  <h1 class="text-center mb-4">{{ profile.user.username }}'s Profile</h1>
+{% endblock page_header %}
+
+{% block content %}
+<div class="profile-container">
+  <div class="row justify-content-center">
+    <!-- 左侧：头像区域（使用模型中的 profile_pic 字段） -->
+    <div class="col-md-4 mb-4 d-flex flex-column align-items-center">
+      {% if profile.profile_pic %}
+        <img src="{{ profile.profile_pic.url }}" alt="{{ profile.user.username }}'s Avatar" 
+             class="profile-avatar rounded-circle border border-3 border-light shadow"
+             style="width: 200px; height: 200px; object-fit: cover;">
+      {% else %}
+        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white shadow"
+             style="width: 200px; height: 200px; font-size: 60px;">
+          {{ profile.user.username|first|upper }}
+        </div>
+      {% endif %}
+
+      <!-- 编辑资料按钮 -->
+      <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary mt-4 w-75">
+        <i class="bi bi-pencil me-1"></i> Edit Profile
+      </a>
+    </div>
+
+    <!-- 右侧：资料信息区域 -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title border-bottom pb-2 mb-3">Profile Information</h5>
+          
+          <div class="profile-info">
+            <!-- 个人简介 -->
+            <div class="mb-3">
+              <p><strong>Bio:</strong></p>
+              <p class="p-3 bg-light rounded">{{ profile.bio|default:"Not provided"|linebreaks }}</p>
+            </div>
+            
+            <!-- 所在地 -->
+            <div class="mb-3">
+              <p><strong>Location:</strong> {{ profile.location|default:"Not provided" }}</p>
+            </div>
+            
+            <!-- 出生日期 -->
+            <div class="mb-3">
+              <p><strong>Birth Date:</strong> {{ profile.birth_date|default:"Not provided"|date:"M d, Y" }}</p>
+            </div>
+            
+            <!-- 注册时间 -->
+            <div class="mb-3">
+              <p><strong>Member Since:</strong> {{ profile.user.date_joined|date:"M d, Y" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .profile-container {
+    padding: 20px 0;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  @media (max-width: 768px) {
+    .col-md-4, .col-md-6 {
+      width: 100%;
+      padding: 0 15px;
+    }
+  }
+</style>
+{% endblock content %}

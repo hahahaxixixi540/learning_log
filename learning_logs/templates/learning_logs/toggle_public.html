@@ -1,0 +1,80 @@
+{% extends 'learning_logs/base.html' %}
+{% load django_bootstrap5 %}
+
+{% block page_header %}
+  <h2>设置主题公开：{{ topic.text }}</h2>
+{% endblock page_header %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <h5>当前状态：
+              {% if topic.is_public %}
+                <span class="text-success">已公开</span>
+              {% else %}
+                <span class="text-secondary">未公开</span>
+              {% endif %}
+            </h5>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">分享链接</label>
+            <div class="input-group">
+              <input type="text" class="form-control" 
+                     value="{{ share_link }}" readonly>
+              <button class="btn btn-outline-secondary" type="button" onclick="copyLink()">
+                复制
+              </button>
+            </div>
+            <small class="form-text text-muted">
+              他人可通过此链接访问主题（需验证权限）
+            </small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="share_password" class="form-label">访问密码（可选）</label>
+            <input type="text" class="form-control" id="share_password" name="share_password" 
+                   value="{{ topic.share_password|default:'' }}" 
+                   placeholder="不设置则无需密码">
+          </div>
+          
+          <div class="mb-3">
+            <label for="share_expire_at" class="form-label">过期时间（可选）</label>
+            <input type="datetime-local" class="form-control" id="share_expire_at" name="share_expire_at"
+                   value="{{ topic.share_expire_at|date:'Y-m-d\TH:i'|default:'' }}">
+            <small class="form-text text-muted">
+              格式：年-月-日 时:分，不设置则永久有效
+            </small>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            {% if topic.is_public %}
+              保存并取消公开
+            {% else %}
+              保存并设为公开
+            {% endif %}
+          </button>
+          <a href="{% url 'learning_logs:topics' %}" class="btn btn-outline-secondary ms-2">
+            取消
+          </a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyLink() {
+    const linkInput = document.querySelector('input[readonly]');
+    linkInput.select();
+    document.execCommand('copy');
+    alert('链接已复制到剪贴板');
+  }
+</script>
+{% endblock content %}

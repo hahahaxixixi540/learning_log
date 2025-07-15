@@ -1,26 +1,58 @@
 {% extends 'learning_logs/base.html' %}
+{% load django_bootstrap5 %}
 
 {% block page_header %}
-    <h1>Topics</h1>
+  <h1 class="text-center mb-4">Your Learning Topics</h1>
 {% endblock page_header %}
 
 {% block content %}
-
-    <ul class="list-group border-bottom pb-2 mb-4">
-         {% for topic in topics %}
-             <li class="list-group-item border-0">
-
-                   <a href="{% url 'learning_logs:topic' topic.id %}">
-                       {{ topic.text  }}</a>
-             </li>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <!-- 话题列表卡片 -->
+    <div class="card shadow-sm mb-5">
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for topic in topics %}
+            <li class="list-group-item d-flex justify-content-between align-items-center py-4">
+              <a href="{% url 'learning_logs:topic' topic.id %}" class="text-decoration-none fs-5 fw-medium">
+                {{ topic.text }}
+                {% if topic.is_public %}
+                  <span class="ms-2 badge bg-success">公开</span>
+                {% endif %}
+              </a>
+              <div class="d-flex align-items-center">
+                <!-- 显示条目数量 -->
+                <span class="badge bg-primary rounded-pill fs-6 px-3 py-1 me-3">
+                  {{ topic.entries.count }} entry{{ topic.entries.count|pluralize }}
+                </span>
+                <!-- 公开设置按钮 -->
+                <a href="{% url 'learning_logs:toggle_public' topic.id %}" class="btn btn-sm btn-outline-secondary me-2">
+                  {% if topic.is_public %}取消公开{% else %}设为公开{% endif %}
+                </a>
+                <!-- 删除按钮 -->
+                <a href="{% url 'learning_logs:delete_topic' topic.id %}" class="text-danger">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </li>
           {% empty %}
-              <li class="list-group-item border-0">No topics have been added yet.</li>
+            <li class="list-group-item py-5 text-center">
+              <div class="text-muted">
+                <i class="bi bi-folder-open fs-1 mb-3"></i>
+                <h5>No topics have been added yet</h5>
+                <p class="mt-2">Create your first topic to organize your learning notes.</p>
+              </div>
+            </li>
           {% endfor %}
-     </ul>
-
-      <a href="{% url 'learning_logs:new_topic'  %}">Add a new topic</a>
-
+        </ul>
+      </div>
+    </div>
+    <!-- 添加新话题按钮 -->
+    <div class="text-center">
+      <a href="{% url 'learning_logs:new_topic' %}" class="btn btn-success btn-lg">
+        <i class="bi bi-folder-plus me-2"></i> Add a New Topic
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock content %}
-
-
-

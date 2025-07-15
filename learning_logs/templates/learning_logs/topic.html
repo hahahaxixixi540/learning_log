@@ -1,26 +1,115 @@
-{% extends 'learning_logs/base.html' %}
-
-{% block page_header %}
-    <h1>{{ topic.text }}</h1>
-{% endblock page_header %}
+{% extends "learning_logs/base.html" %}
+{% load comments_tags %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-
-  <p>
-    <a href="{% url 'learning_logs:new_entry' topic.id %}">Add new entry</a>
-  </p>
-
-    {% for entry in entries %}
-       <div class="card mb-3">
-           <h4 class="card-header">
-               {{ entry.date_added|date:'M d,Y H:i' }}
-              <small><a href="{% url 'learning_logs:edit_entry' entry.id %}">
-                  edit entry</a></small>
-           </h4>
-           <div class="card-body">{{ entry.text|linebreaks }}</div>
-       </div>
-    {% empty %}
-      <p>There are no entries for this topic yet.</p>
-    {% endfor %}
-
+  <p>主题: {{ topic }}</p>
+  
+  <!-- 显示主题公开状态 -->
+  {% if is_owner %}
+    <p class="text-muted">
+      当前状态：{% if topic.is_public %}<span class="text-success">已公开</span>{% else %}<span class="text-secondary">未公开</span>{% endif %}
+      <a href="{% url 'learning_logs:toggle_public' topic.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" class="ms-2 btn btn-sm btn-outline-primary">
+        {% if topic.is_public %}修改公开设置{% else %}设为公开{% endif %}
+      </a>
+    </p>
+  {% endif %}
+  
+  <!-- 搜索表单：携带密码参数 -->
+  <form method="get" action="{% url 'learning_logs:topic' topic.id %}" class="search-form mb-3">
+    <input type="text" name="q" 
+           placeholder="搜索条目内容..." 
+           value="{{ search_query }}"
+           class="form-control d-inline-block w-auto" style="width: 300px;">
+    <button type="submit" class="btn btn-primary ms-2">搜索</button>
+    {% if search_query %}
+      <a href="{% url 'learning_logs:topic' topic.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" class="btn btn-outline-secondary ms-2">清空</a>
+    {% endif %}
+    <!-- 隐藏字段：保留密码参数 -->
+    {% if topic.share_password and request.GET.password %}
+      <input type="hidden" name="password" value="{{ request.GET.password }}">
+    {% endif %}
+  </form>
+  
+  <!-- 新增条目链接：仅所有者可见 -->
+  {% if is_owner %}
+    <p class="add-entry-link mb-4">
+      <a href="{% url 'learning_logs:new_entry' topic.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" class="btn btn-success">添加新条目</a>
+    </p>
+  {% endif %}
+  
+  <!-- 条目列表 -->
+  {% for entry in entries %}
+    <div class="entry-card card mb-4">
+      <div class="card-body">
+        <p class="entry-date text-muted">{{ entry.date_added|date:'M d, Y H:i' }}</p>
+        
+        <!-- 条目内容 -->
+        <p class="entry-text">{{ entry.text|linebreaks }}</p>
+        
+        <!-- 媒体内容 -->
+        {% if entry.image %}
+          <div class="entry-image-container mb-3">
+            <img src="{{ entry.image.url }}" alt="条目图片" class="img-fluid rounded" style="max-height: 400px;">
+          </div>
+        {% endif %}
+        {% if entry.video %}
+          <div class="entry-video-container mt-3 mb-3">
+            <video controls class="img-fluid rounded" style="max-height: 400px;">
+              <source src="{{ entry.video.url }}" type="video/mp4">
+              您的浏览器不支持视频播放
+            </video>
+          </div>
+        {% endif %}
+        
+        <!-- 操作按钮：仅所有者可见 -->
+        {% if is_owner %}
+          <div class="entry-actions mb-3">
+            <a href="{% url 'learning_logs:edit_entry' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" class="btn btn-sm btn-outline-primary">编辑</a>
+            <a href="{% url 'learning_logs:delete_entry' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" class="btn btn-sm btn-outline-danger ms-2">删除</a>
+          </div>
+        {% endif %}
+        
+        <!-- 点赞区域 -->
+        <div class="like-section mb-3">
+          {% if user.is_authenticated %}
+            <a href="{% url 'learning_logs:like_entry' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" 
+               class="btn btn-sm {% if entry.user_liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+              <i class="bi {% if entry.user_liked %}bi-heart-fill{% else %}bi-heart{% endif %} me-1"></i>
+              {% if entry.user_liked %}已点赞{% else %}点赞{% endif %}
+            </a>
+          {% else %}
+            <button class="btn btn-sm btn-outline-danger" disabled>点赞</button>
+            <small class="text-muted ms-2">(登录后可点赞)</small>
+          {% endif %}
+          <span class="like-count ms-2 text-muted">{{ entry.like_count }} 人点赞</span>
+        </div>
+        
+        <!-- 评论区域：正确传递所有参数 -->
+        <div class="comment-section">
+          <div class="comment-list">
+            <h6 class="comment-count mb-3">评论 ({{ entry.comment_count }})</h6>
+            {% render_comments entry.top_level_comments reply_to=reply_to user=user topic=topic %}
+          </div>
+          
+          <!-- 顶级评论表单 -->
+          {% if user.is_authenticated %}
+            <form action="{% url 'learning_logs:add_comment' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" method="post" class="comment-form mt-3">
+              {% csrf_token %}
+              <textarea name="text" rows="3" placeholder="添加评论..." 
+                        style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+              <input type="hidden" name="parent_id" value="0">
+              <button type="submit" style="margin-top: 10px; padding: 5px 15px; background: #0d6efd; color: white; border: none; border-radius: 4px;">提交评论</button>
+            </form>
+          {% else %}
+            <p class="login-to-comment text-muted mt-3">
+              <a href="{% url 'accounts:login' %}?next={{ request.path }}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}">登录</a> 后可发表评论
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="no-entries text-center py-5">此主题下暂无条目</p>
+  {% endfor %}
 {% endblock content %}

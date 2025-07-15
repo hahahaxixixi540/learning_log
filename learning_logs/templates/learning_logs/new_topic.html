@@ -1,12 +1,41 @@
 {% extends "learning_logs/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block page_header %}
+  <div class="d-flex align-items-center">
+    <a href="{% url 'learning_logs:topics' %}" class="btn btn-outline-secondary me-3">
+      <i class="bi bi-arrow-left"></i> Back to Topics
+    </a>
+    <h2>Add a New Topic</h2>
+  </div>
+{% endblock page_header %}
 
 {% block content %}
-    <p>Add a new topic:</p >
-  
-    <form action="{% url 'learning_logs:new_topic' %}" method='post'>
-       {% csrf_token %}
-       {{ form.as_div}}
-      <button name="submit">Add topic</button>
-    </form>
-
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm p-5">
+      <form action="{% url 'learning_logs:new_topic' %}" method='post'>
+        {% csrf_token %}
+        
+        <!-- 用 bootstrap5 渲染字段（自动添加样式，无需 add_class） -->
+        <div class="mb-3">
+          {% bootstrap_field form.text placeholder="e.g., Python Basics, Machine Learning..." %}
+          <small class="text-muted d-block mt-1">
+            Choose a clear, descriptive name for your topic (max 100 characters).
+          </small>
+        </div>
+        
+        <!-- 按钮区域 -->
+        <div class="d-flex justify-content-end">
+          <a href="{% url 'learning_logs:topics' %}" class="btn btn-outline-secondary me-2">
+            Cancel
+          </a>
+          <button name="submit" class="btn btn-success">
+            <i class="bi bi-folder-plus me-1"></i> Add Topic
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock content %}

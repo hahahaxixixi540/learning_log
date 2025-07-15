@@ -1,0 +1,94 @@
+{% extends "learning_logs/base.html" %}
+{% load django_bootstrap5 %}  <!-- 仅保留 bootstrap5 标签 -->
+
+{% block page_header %}
+  <h1 class="text-center mb-4">Edit Profile</h1>
+{% endblock page_header %}
+
+{% block content %}
+<div class="profile-edit-container">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-sm">
+        <div class="card-body p-5">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row g-5">
+              <!-- 头像上传区域 -->
+              <div class="col-md-4 d-flex flex-column align-items-center">
+                <h5 class="mb-3 text-center">Profile Photo</h5>
+                
+                <!-- 头像预览 -->
+                {% if profile.profile_pic %}  <!-- 注意：模型中字段是 profile_pic 而非 avatar -->
+                  <img id="avatar-preview" src="{{ profile.profile_pic.url }}" alt="Current Avatar" 
+                       class="rounded-circle border border-2 border-light shadow mb-3"
+                       style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                  <div id="avatar-preview" class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white shadow mb-3"
+                       style="width: 150px; height: 150px; font-size: 40px;">
+                    {{ profile.user.username|first|upper }}
+                  </div>
+                {% endif %}
+                
+                <!-- 头像上传控件（用 bootstrap5 渲染） -->
+                <div class="w-100">
+                  {% bootstrap_field form.profile_pic %}  <!-- 对应模型中的 profile_pic 字段 -->
+                  <small class="text-muted d-block mt-1">Supported formats: JPG, PNG. Recommended size: 200x200px</small>
+                </div>
+              </div>
+              
+              <!-- 资料编辑区域 -->
+              <div class="col-md-8">
+                <h5 class="mb-3">Personal Details</h5>
+                
+                <!-- 用 bootstrap5 渲染表单字段 -->
+                <div class="mb-3">
+                  {% bootstrap_field form.bio %}
+                  <small class="text-muted">Max 500 characters, line breaks supported</small>
+                </div>
+                
+                <div class="mb-3">
+                  {% bootstrap_field form.location %}
+                </div>
+                
+                <div class="mb-3">
+                  {% bootstrap_field form.birth_date %}
+                </div>
+                
+                <!-- 按钮区域 -->
+                <div class="d-flex justify-content-end mt-4">
+                  <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 头像预览脚本 -->
+<script>
+document.getElementById('id_profile_pic').addEventListener('change', function(e) {  // 对应字段 ID 是 id_profile_pic
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const preview = document.getElementById('avatar-preview');
+      if (preview.tagName === 'DIV') {
+        const newImg = document.createElement('img');
+        newImg.id = 'avatar-preview';
+        newImg.className = 'rounded-circle border border-2 border-light shadow mb-3';
+        newImg.style = 'width: 150px; height: 150px; object-fit: cover;';
+        preview.parentNode.replaceChild(newImg, preview);
+      }
+      document.getElementById('avatar-preview').src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+{% endblock content %}
