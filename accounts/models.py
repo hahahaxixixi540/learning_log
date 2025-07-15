@@ -38,15 +38,9 @@ class Profile(models.Model):
         verbose_name = '个人资料'
         verbose_name_plural = '个人资料'
 
-# 信号处理器 - 只创建，不更新
+# 信号处理器
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         with transaction.atomic():
             Profile.objects.create(user=instance)
-
-# 注释掉这个信号处理器，避免重复更新
-# @receiver(post_save, sender=User)
-# def save_user_profile(sender, instance, **kwargs):
-#     if hasattr(instance, 'profile'):
-#         instance.profile.save(update_fields=['bio', 'location', 'birth_date'])

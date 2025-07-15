@@ -17,7 +17,7 @@
       <form action="{% url 'learning_logs:new_topic' %}" method='post'>
         {% csrf_token %}
         
-        <!-- 用 bootstrap5 渲染字段（自动添加样式，无需 add_class） -->
+        <!-- 用 bootstrap5 渲染字段-->
         <div class="mb-3">
           {% bootstrap_field form.text placeholder="e.g., Python Basics, Machine Learning..." %}
           <small class="text-muted d-block mt-1">

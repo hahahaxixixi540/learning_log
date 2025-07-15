@@ -7,7 +7,7 @@ from .forms import ProfileForm, CustomUserCreationForm
 from .models import Profile
 
 def register(request):
-    """处理用户注册"""
+    """用户注册"""
     if request.method != 'POST':
         form = CustomUserCreationForm()
     else:
@@ -15,8 +15,7 @@ def register(request):
         if form.is_valid():
             new_user = form.save()
             
-            # 移除手动创建Profile的代码，让信号处理器负责
-            # Profile.objects.create(...)
+           
             
             login(request, new_user)
             return redirect('accounts:profile')

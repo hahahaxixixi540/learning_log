@@ -14,9 +14,9 @@ ALLOWED_HOSTS = []
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-# 新增：文件上传大小限制（图片+视频）
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB（整体限制）
-FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50MB（单个文件限制）
+# 文件上传大小限制
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800   
 
 INSTALLED_APPS = [
     'learning_logs',

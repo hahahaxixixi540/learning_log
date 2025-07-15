@@ -14,7 +14,6 @@ urlpatterns = [
     path('toggle_public/<int:topic_id>/', views.toggle_public_topic, name='toggle_public'),
     path('entries/<int:entry_id>/like/', views.like_entry, name='like_entry'),
     path('entries/<int:entry_id>/comment/', views.add_comment, name='add_comment'),
-    # 新增：收藏相关路由（完全独立）
-    path('entries/<int:entry_id>/bookmark/', views.bookmark_entry, name='bookmark_entry'),  # 收藏/取消收藏
-    path('bookmarks/', views.bookmarked_entries, name='bookmarked_entries'),  # 收藏列表页
+    path('entries/<int:entry_id>/bookmark/', views.bookmark_entry, name='bookmark_entry'),  
+    path('bookmarks/', views.bookmarked_entries, name='bookmarked_entries'),  
 ]

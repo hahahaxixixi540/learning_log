@@ -8,7 +8,7 @@
 {% block content %}
 <div class="profile-container">
   <div class="row justify-content-center">
-    <!-- 左侧：头像区域（使用模型中的 profile_pic 字段） -->
+    <!-- 左侧：头像区域 -->
     <div class="col-md-4 mb-4 d-flex flex-column align-items-center">
       {% if profile.profile_pic %}
         <img src="{{ profile.profile_pic.url }}" alt="{{ profile.user.username }}'s Avatar" 

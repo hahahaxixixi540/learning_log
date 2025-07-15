@@ -1,5 +1,5 @@
 {% extends "learning_logs/base.html" %}
-{% load django_bootstrap5 %}  <!-- 仅保留 bootstrap5 标签 -->
+{% load django_bootstrap5 %}  
 
 {% block page_header %}
   <h1 class="text-center mb-4">Edit Profile</h1>
@@ -20,7 +20,7 @@
                 <h5 class="mb-3 text-center">Profile Photo</h5>
                 
                 <!-- 头像预览 -->
-                {% if profile.profile_pic %}  <!-- 注意：模型中字段是 profile_pic 而非 avatar -->
+                {% if profile.profile_pic %}  
                   <img id="avatar-preview" src="{{ profile.profile_pic.url }}" alt="Current Avatar" 
                        class="rounded-circle border border-2 border-light shadow mb-3"
                        style="width: 150px; height: 150px; object-fit: cover;">
@@ -31,7 +31,6 @@
                   </div>
                 {% endif %}
                 
-                <!-- 头像上传控件（用 bootstrap5 渲染） -->
                 <div class="w-100">
                   {% bootstrap_field form.profile_pic %}  <!-- 对应模型中的 profile_pic 字段 -->
                   <small class="text-muted d-block mt-1">Supported formats: JPG, PNG. Recommended size: 200x200px</small>
@@ -42,7 +41,6 @@
               <div class="col-md-8">
                 <h5 class="mb-3">Personal Details</h5>
                 
-                <!-- 用 bootstrap5 渲染表单字段 -->
                 <div class="mb-3">
                   {% bootstrap_field form.bio %}
                   <small class="text-muted">Max 500 characters, line breaks supported</small>

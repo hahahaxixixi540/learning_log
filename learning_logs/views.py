@@ -4,7 +4,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from .models import Topic, Entry, Like, Comment, EntryBookmark  # 新增EntryBookmark
+from .models import Topic, Entry, Like, Comment, EntryBookmark  
 from .forms import TopicForm, EntryForm, CommentForm
 
 def index(request):
@@ -16,7 +16,7 @@ def topics(request):
     return render(request, 'learning_logs/topics.html', {'topics': topics})
 
 def topic(request, topic_id):
-    """通过会话记录密码验证状态，避免重复验证"""
+    """通过会话记录密码验证状态"""
     topic = get_object_or_404(Topic, id=topic_id)
     is_owner = (topic.owner == request.user)
     session_key = f"topic_{topic_id}_authenticated"
@@ -45,7 +45,6 @@ def topic(request, topic_id):
         entry.user_liked = entry.likes.filter(user=request.user).exists() if request.user.is_authenticated else False
         entry.comment_count = entry.comments.count()
         entry.top_level_comments = entry.comments.filter(parent__isnull=True)
-        # 新增：判断当前用户是否收藏了该条目
         entry.is_bookmarked = entry.bookmarked_by.filter(user=request.user).exists() if request.user.is_authenticated else False
     
     if search_query:
@@ -179,33 +178,33 @@ def add_comment(request, entry_id):
     redirect_url = request.META.get('HTTP_REFERER', f'/topics/{entry.topic.id}/')
     return redirect(redirect_url)
 
-# 新增：收藏相关视图（完全独立）
+# 收藏相关视图
 @login_required
 def bookmark_entry(request, entry_id):
     """处理收藏/取消收藏操作"""
     entry = get_object_or_404(Entry, id=entry_id)
-    # 权限校验：只能收藏自己的条目或公开主题的条目
+    # 权限校验
     if entry.topic.owner != request.user and not entry.topic.is_public:
         raise Http404("无法收藏未公开的条目")
     
-    # 切换收藏状态（存在则删除，不存在则创建）
+    # 切换收藏状态
     bookmark, created = EntryBookmark.objects.get_or_create(user=request.user, entry=entry)
     if not created:
-        bookmark.delete()  # 取消收藏
+        bookmark.delete()  
     
-    # 操作后返回原页面（保留页面状态）
+    # 操作后返回原页面
     redirect_url = request.META.get('HTTP_REFERER', f'/topics/{entry.topic.id}/')
     return redirect(redirect_url)
 
 @login_required
 def bookmarked_entries(request):
     """展示用户收藏的所有条目"""
-    # 获取当前用户的所有收藏，关联查询条目和主题（优化性能）
+    # 获取当前用户的所有收藏，关联查询条目和主题
     bookmarks = EntryBookmark.objects.filter(
         user=request.user
     ).select_related('entry', 'entry__topic').order_by('-bookmarked_at')
     
-    # 提取条目列表（去重，按收藏时间倒序）
+    # 提取条目列表
     entries = [bookmark.entry for bookmark in bookmarks]
     
     return render(request, 'learning_logs/bookmarked_entries.html', {

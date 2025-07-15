@@ -11,7 +11,7 @@
     <div class="card shadow-sm p-5">
       <form action="{% url 'accounts:register' %}" method='post'>
         {% csrf_token %}
-        {% bootstrap_form form %}  <!-- 用 bootstrap5 渲染整个表单 -->
+        {% bootstrap_form form %}  
         
         <button name="submit" class="btn btn-primary">Register</button>
       </form>

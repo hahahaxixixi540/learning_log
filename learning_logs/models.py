@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 class Topic(models.Model):
-    """用户学习笔记中的主题（支持公开分享）"""
+    """用户学习笔记中的主题"""
     text = models.CharField(
         _("主题名称"),
         max_length=200,
@@ -57,7 +57,7 @@ class Topic(models.Model):
         ordering = ["-date_added"]
 
 class Entry(models.Model):
-    """与主题相关的具体条目内容（新增音频支持）"""
+    """与主题相关的具体条目内容"""
     topic = models.ForeignKey(
         Topic,
         on_delete=models.CASCADE,
@@ -111,7 +111,7 @@ class Like(models.Model):
         unique_together = ('entry', 'user')  # 防止重复点赞
 
 class Comment(models.Model):
-    """评论模型（支持嵌套回复）"""
+    """评论模型"""
     entry = models.ForeignKey(
         Entry,
         on_delete=models.CASCADE,
@@ -141,7 +141,7 @@ class Comment(models.Model):
     def get_replies(self):
         return self.replies.all()
 
-# 新增：条目收藏模型（完全独立，不影响现有模型）
+# 条目收藏模型
 class EntryBookmark(models.Model):
     """用户收藏条目模型"""
     user = models.ForeignKey(

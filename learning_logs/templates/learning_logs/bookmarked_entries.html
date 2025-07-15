@@ -26,7 +26,7 @@
             <!-- 条目内容预览 -->
             <p class="entry-text">{{ entry.text|truncatechars:200|linebreaks }}</p>
             
-            <!-- 媒体内容提示（仅显示存在的类型） -->
+            <!-- 媒体内容提示（显示存在的类型） -->
             <div class="media-indicators mb-3">
               {% if entry.image %}
                 <span class="badge bg-secondary me-2">含图片</span>
