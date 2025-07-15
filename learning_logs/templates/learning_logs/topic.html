@@ -25,7 +25,6 @@
     {% if search_query %}
       <a href="{% url 'learning_logs:topic' topic.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" class="btn btn-outline-secondary ms-2">清空</a>
     {% endif %}
-    <!-- 隐藏字段：保留密码参数 -->
     {% if topic.share_password and request.GET.password %}
       <input type="hidden" name="password" value="{{ request.GET.password }}">
     {% endif %}
@@ -53,12 +52,23 @@
             <img src="{{ entry.image.url }}" alt="条目图片" class="img-fluid rounded" style="max-height: 400px;">
           </div>
         {% endif %}
+        
         {% if entry.video %}
           <div class="entry-video-container mt-3 mb-3">
             <video controls class="img-fluid rounded" style="max-height: 400px;">
               <source src="{{ entry.video.url }}" type="video/mp4">
               您的浏览器不支持视频播放
             </video>
+          </div>
+        {% endif %}
+        
+        {% if entry.audio %}
+          <div class="entry-audio-container mt-3 mb-3">
+            <p class="text-muted">音频内容：</p>
+            <audio controls class="w-100 max-w-md">
+              <source src="{{ entry.audio.url }}" type="audio/mpeg">
+              您的浏览器不支持音频播放
+            </audio>
           </div>
         {% endif %}
         
@@ -71,7 +81,7 @@
         {% endif %}
         
         <!-- 点赞区域 -->
-        <div class="like-section mb-3">
+        <div class="like-section mb-2">
           {% if user.is_authenticated %}
             <a href="{% url 'learning_logs:like_entry' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" 
                class="btn btn-sm {% if entry.user_liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
@@ -85,7 +95,31 @@
           <span class="like-count ms-2 text-muted">{{ entry.like_count }} 人点赞</span>
         </div>
         
-        <!-- 评论区域：正确传递所有参数 -->
+        <!-- 新增：收藏区域 -->
+        <div class="bookmark-section mb-3">
+          {% if user.is_authenticated %}
+            {% if entry.is_bookmarked %}
+              <!-- 已收藏状态 -->
+              <a href="{% url 'learning_logs:bookmark_entry' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" 
+                 class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-bookmark-check me-1"></i> 已收藏
+              </a>
+            {% else %}
+              <!-- 未收藏状态 -->
+              <a href="{% url 'learning_logs:bookmark_entry' entry.id %}{% if topic.share_password %}?password={{ request.GET.password }}{% endif %}" 
+                 class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-bookmark me-1"></i> 收藏
+              </a>
+            {% endif %}
+          {% else %}
+            <button class="btn btn-sm btn-outline-primary" disabled>
+              <i class="bi bi-bookmark me-1"></i> 收藏
+            </button>
+            <small class="text-muted ms-2">(登录后可收藏)</small>
+          {% endif %}
+        </div>
+        
+        <!-- 评论区域 -->
         <div class="comment-section">
           <div class="comment-list">
             <h6 class="comment-count mb-3">评论 ({{ entry.comment_count }})</h6>

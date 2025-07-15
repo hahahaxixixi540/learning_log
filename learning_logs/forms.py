@@ -10,11 +10,13 @@ class TopicForm(forms.ModelForm):
 class EntryForm(forms.ModelForm):
     class Meta:
         model = Entry
-        fields = ['text', 'image', 'video']
+        # 新增audio字段
+        fields = ['text', 'image', 'video', 'audio']
         labels = {
             'text': '',
             'image': '上传图片（可选）',
-            'video': '上传视频（可选）'
+            'video': '上传视频（可选）',
+            'audio': '上传音频（可选）'  # 音频字段标签
         }
         widgets = {
             'text': forms.Textarea(attrs={'cols': 80, 'rows': 6}),
@@ -22,9 +24,7 @@ class EntryForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
     """支持无JS回复的评论表单"""
-    # 父评论ID（标识回复对象）
     parent_id = forms.IntegerField(widget=forms.HiddenInput, required=False, initial=0)
-    # 控制回复表单显示的标记
     show_reply = forms.BooleanField(widget=forms.HiddenInput, required=False, initial=False)
     
     class Meta:

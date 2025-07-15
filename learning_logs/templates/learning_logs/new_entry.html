@@ -14,7 +14,7 @@
 <div class="row justify-content-center">
   <div class="col-md-8">
     <div class="card shadow-sm p-5">
-      <!-- 支持文件上传（图片+视频） -->
+      <!-- 支持文件上传（图片+视频+音频） -->
       <form action="{% url 'learning_logs:new_entry' topic.id %}" 
             method='post' 
             enctype="multipart/form-data">
@@ -36,11 +36,19 @@
           </small>
         </div>
         
-        <!-- 新增视频上传控件 -->
+        <!-- 视频上传控件 -->
         <div class="mb-4">
           {% bootstrap_field form.video %}
           <small class="text-muted d-block mt-1">
             支持上传MP4、WebM格式视频，最大尺寸不超过50MB
+          </small>
+        </div>
+        
+        <!-- 新增音频上传控件 -->
+        <div class="mb-4">
+          {% bootstrap_field form.audio %}
+          <small class="text-muted d-block mt-1">
+            支持上传MP3、WAV格式音频，最大尺寸不超过20MB
           </small>
         </div>
         

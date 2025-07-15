@@ -44,11 +44,8 @@ class Topic(models.Model):
         return self.text
     
     def save(self, *args, **kwargs):
-        """完善：保存时自动处理过期逻辑，确保状态一致性"""
-        # 若设置了过期时间且已过期，强制设为不公开
         if self.share_expire_at and self.share_expire_at < timezone.now():
             self.is_public = False
-        # 若未公开，清空密码和过期时间（避免无效配置）
         if not self.is_public:
             self.share_password = None
             self.share_expire_at = None
@@ -60,7 +57,7 @@ class Topic(models.Model):
         ordering = ["-date_added"]
 
 class Entry(models.Model):
-    """与主题相关的具体条目内容"""
+    """与主题相关的具体条目内容（新增音频支持）"""
     topic = models.ForeignKey(
         Topic,
         on_delete=models.CASCADE,
@@ -68,17 +65,27 @@ class Entry(models.Model):
         related_name="entries"
     )
     text = models.TextField(_("条目内容"))
+    # 图片字段
     image = models.ImageField(
         _("条目图片"),
         upload_to="entry_media/images/%Y/%m/%d/",
         blank=True,
         null=True
     )
+    # 视频字段
     video = models.FileField(
         _("条目视频"),
         upload_to="entry_media/videos/%Y/%m/%d/",
         blank=True,
         null=True
+    )
+    # 音频字段
+    audio = models.FileField(
+        _("条目音频"),
+        upload_to="entry_media/audio/%Y/%m/%d/",
+        blank=True,
+        null=True,
+        help_text=_("可选：上传音频文件（支持MP3、WAV格式）")
     )
     date_added = models.DateTimeField(_("创建时间"), auto_now_add=True)
     
@@ -133,3 +140,33 @@ class Comment(models.Model):
     
     def get_replies(self):
         return self.replies.all()
+
+# 新增：条目收藏模型（完全独立，不影响现有模型）
+class EntryBookmark(models.Model):
+    """用户收藏条目模型"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bookmarked_entries',  # 反向关联：user.bookmarked_entries.all()
+        verbose_name=_("收藏用户")
+    )
+    entry = models.ForeignKey(
+        Entry,
+        on_delete=models.CASCADE,
+        related_name='bookmarked_by',  # 反向关联：entry.bookmarked_by.all()
+        verbose_name=_("被收藏条目")
+    )
+    bookmarked_at = models.DateTimeField(
+        _("收藏时间"),
+        auto_now_add=True,
+        db_index=True
+    )
+    
+    class Meta:
+        unique_together = ('user', 'entry')  # 同一用户不能重复收藏同一条目
+        ordering = ['-bookmarked_at']  # 按收藏时间倒序
+        verbose_name = _("条目收藏")
+        verbose_name_plural = _("条目收藏")
+    
+    def __str__(self):
+        return f"{self.user.username} 收藏了 {self.entry.text[:20]}"

@@ -5,19 +5,17 @@
       <meta name="viewport" content="width=device-width,initial-scale=1">
       <title>Learning Log</title>
       
-      <!-- 新增：CSRF Token 元标签（用于点赞功能的AJAX请求） -->
       <meta name="csrf-token" content="{{ csrf_token }}">
       
       {% load django_bootstrap5 %}
       {% bootstrap_css %}
       {% bootstrap_javascript %}
       
-      <!-- 新增：Bootstrap Icons CDN -->
+      <!-- Bootstrap Icons CDN -->
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
       
-      <!-- 自定义样式（原有 + 新增） -->
+      <!-- 自定义样式 -->
       <style>
-        /* 原有样式：头像和下拉菜单 */
         .nav-avatar {
             width: 32px;
             height: 32px;
@@ -30,7 +28,6 @@
             right: 0;
             left: auto;
         }
-        /* 新增：全局背景图片样式 */
         body {
             background-image: url("/static/images/bg.jpg");
             background-attachment: fixed;
@@ -40,7 +37,6 @@
             min-height: 100vh;
             margin: 0;
         }
-        /* 新增：内容区域边框和背景样式 */
         main.container {
             background-color: rgba(255, 255, 255, 0.9);
             border: 1px solid #dee2e6;
@@ -50,16 +46,12 @@
             margin-bottom: 40px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        /* 优化导航栏与内容区的衔接 */
         .navbar {
             margin-bottom: 0;
         }
-        /* 优化页面标题区域的间距 */
         .border-bottom {
             padding-bottom: 10px;
         }
-
-        /* ====== 新增的样式代码（用于topic.html的点赞、评论等功能） ====== */
         /* 搜索表单样式 */
         .search-form {
             margin: 20px 0;
@@ -84,19 +76,16 @@
             color: #666;
             text-decoration: none;
         }
-
         /* 搜索结果提示 */
         .search-result-info {
             color: #666;
             margin: -10px 0 15px 0;
         }
-
         /* 新增条目链接 */
         .add-entry-link a {
             color: #0066cc;
             text-decoration: none;
         }
-
         /* 条目卡片样式 */
         .entry-card {
             background-color: #f9f9f9;
@@ -105,21 +94,18 @@
             border-radius: 4px;
             border-left: 3px solid #4CAF50;
         }
-
         /* 条目日期 */
         .entry-date {
             margin: 0 0 10px 0;
             color: #666;
             font-size: 0.9em;
         }
-
         /* 条目文字内容 */
         .entry-text {
             margin: 0 0 15px 0;
             line-height: 1.6;
             color: #444;
         }
-
         /* 条目图片 */
         .entry-image-container {
             margin: 10px 0;
@@ -133,7 +119,6 @@
             object-fit: contain;
             border-radius: 2px;
         }
-
         /* 条目操作按钮 */
         .entry-actions {
             margin: 10px 0 0 0;
@@ -149,7 +134,6 @@
             font-size: 0.9em;
             margin-left: 15px;
         }
-
         /* 点赞区域 */
         .like-section {
             margin: 15px 0;
@@ -174,7 +158,11 @@
             margin-left: 10px;
             color: #666;
         }
-
+        /* 收藏区域（新增） */
+        .bookmark-section {
+            margin: 10px 0;
+            padding-top: 5px;
+        }
         /* 评论区域 */
         .comment-section {
             margin-top: 20px;
@@ -216,7 +204,6 @@
             color: #888;
             font-size: 0.9em;
         }
-
         /* 评论表单 */
         .comment-form {
             margin-top: 10px;
@@ -246,13 +233,11 @@
         .login-to-comment a {
             color: #0066cc;
         }
-
         /* 空状态提示 */
         .no-entries {
             color: #666;
             font-style: italic;
         }
-        /* ====== 新增样式结束 ====== */
       </style>
 </head>
 <body>
@@ -271,6 +256,12 @@
                 <li class="nav-item">
                    <a class="nav-link" href="{% url 'learning_logs:topics' %}">
                       Topics</a></li>
+                <!-- 新增：收藏页入口 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'learning_logs:bookmarked_entries' %}">
+                        <i class="bi bi-bookmark-check me-1"></i>我的收藏
+                    </a>
+                </li>
             </ul>
     
             <ul class="navbar-nav ms-auto mb-2 mb-md-0">

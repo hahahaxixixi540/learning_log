@@ -1,0 +1,70 @@
+{% extends "learning_logs/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block page_header %}
+  <h2>{{ page_title }}</h2>
+{% endblock page_header %}
+
+{% block content %}
+  {% if entries %}
+    <div class="entries-container">
+      {% for entry in entries %}
+        <div class="entry-card card mb-4">
+          <div class="card-body">
+            <!-- 显示条目所属主题 -->
+            <p class="text-muted">
+              来自主题：<a href="{% url 'learning_logs:topic' entry.topic.id %}" class="text-primary">
+                {{ entry.topic.text }}
+              </a>
+            </p>
+            
+            <!-- 收藏时间 -->
+            <p class="entry-date text-muted">
+              收藏于：{{ entry.bookmarked_at|date:'M d, Y H:i' }}
+            </p>
+            
+            <!-- 条目内容预览 -->
+            <p class="entry-text">{{ entry.text|truncatechars:200|linebreaks }}</p>
+            
+            <!-- 媒体内容提示（仅显示存在的类型） -->
+            <div class="media-indicators mb-3">
+              {% if entry.image %}
+                <span class="badge bg-secondary me-2">含图片</span>
+              {% endif %}
+              {% if entry.video %}
+                <span class="badge bg-secondary me-2">含视频</span>
+              {% endif %}
+              {% if entry.audio %}
+                <span class="badge bg-secondary">含音频</span>
+              {% endif %}
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="entry-actions">
+              <!-- 查看完整条目 -->
+              <a href="{% url 'learning_logs:topic' entry.topic.id %}#entry-{{ entry.id }}" 
+                 class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-eye me-1"></i> 查看完整条目
+              </a>
+              
+              <!-- 取消收藏 -->
+              <a href="{% url 'learning_logs:bookmark_entry' entry.id %}" 
+                 class="btn btn-sm btn-outline-danger ms-2">
+                <i class="bi bi-trash me-1"></i> 取消收藏
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- 空状态提示 -->
+    <div class="text-center py-5">
+      <i class="bi bi-bookmark fs-1 text-muted mb-3"></i>
+      <p class="text-muted">您还没有收藏任何条目</p>
+      <a href="{% url 'learning_logs:topics' %}" class="btn btn-primary">
+        <i class="bi bi-arrow-left me-1"></i> 去浏览条目
+      </a>
+    </div>
+  {% endif %}
+{% endblock content %}
